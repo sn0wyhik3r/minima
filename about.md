@@ -6,7 +6,7 @@ permalink: /about/
 
 ## About Me
 
-Hello! My name is **Federico**, but I’m better known by my online alias **snowyhiker**. I am deeply passionate about technology, particularly in the field of **penetration testing** and **cybersecurity**.
+Hello ! My name is **Federico**, but I’m better known by my online alias **snowyhiker**. I am deeply passionate about technology, particularly in the field of **penetration testing** and **cybersecurity**.
 
 I’ve always been fascinated by how systems work and how they can be made more secure. Over time, this curiosity evolved into a passion for ethical hacking, where I focus on testing and securing digital infrastructures against potential threats.
 
