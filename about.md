@@ -12,4 +12,4 @@ Hi, I'm snowyhiker and I'm passionate about **computers**. To get where I am tod
 
 My passion for this practice began when I was **just a child**. My father was tinkering on his computer with [**Windows XP**](https://en.wikipedia.org/wiki/Windows_XP) installed, and I was immediately hooked on this intriguing "machine". That's how I discovered what a computer was back then. What still sticks in my mind today is that **famous wallpaper** he had... It still makes me very **nostalgic**. Here's a photo of that same wallpaper :
 
-![windows_xp](/assets/images/windows_xp.jpg]
+![windows_xp](/assets/images/windows_xp.jpg)
