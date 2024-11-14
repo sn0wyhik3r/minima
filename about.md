@@ -36,3 +36,7 @@ The content on this blog will include :
 <a href="https://discordapp.com/users/1293829381927473202" target="_blank">
   <img src="https://upload.wikimedia.org/wikipedia/fr/thumb/4/4f/Discord_Logo_sans_texte.svg/1818px-Discord_Logo_sans_texte.svg.png" alt="Discord Logo" width="50" height="55">
 </a>
+
+<a href="https://www.linkedin.com/in/snowyhiker/" target="_blank">
+  <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="Linkedin Logo" width="50" height="55">
+</a>
