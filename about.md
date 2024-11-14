@@ -10,6 +10,6 @@ Hi, I'm snowyhiker and I'm passionate about **computers**. To get where I am tod
 
 ## My passion for computers
 
-My passion for this practice began when I was **just a child**. My father was tinkering on his computer with [**Windows XP**](https://en.wikipedia.org/wiki/Windows_XP) installed, and I was immediately hooked on this intriguing "machine". That's how I discovered what a computer was back then. What still sticks in my mind today is that **famous wallpaper** he had... It still makes me very **nostalgic**. Here's a photo of that same wallpaper :
+My passion for this practice began when I was **just a child**. My father was tinkering on his computer with [**Windows XP**](https://en.wikipedia.org/wiki/Windows_XP) installed, and I was immediately hooked on this intriguing "machine". That's how I discovered what a computer was back then. What still sticks in my mind today is that **famous [wallpaper](/assets/images/windows_xp.jpg)** he had... It still makes me very **nostalgic**.
 
-![windows_xp](/assets/images/windows_xp.jpg)
+In this field, what drives me most is the **adrenalin**. Indeed, when you break into a system and find **vulnerabilities** or **misconfigurations**, I find it **thrilling**. I don't know how to explain it, but I don't think I'm the only one who feels that way. There's also the thirst **to learn**, and to know **as much as possible about a field I'm passionate about.
