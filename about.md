@@ -44,7 +44,11 @@ To contact me, you can click directly on the **icons below**, which will redirec
     <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="Linkedin Logo" width="50" height="50">
   </a>
 
-  <a href="https://github.com/sn0wyhik3r" target="_blank">
+  <a href="https://github.com/sn0wyhik3r" target="_blank" style="margin-right: 20px;">
     <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="Github Logo" width="50" height="50">
+  </a>
+
+  <a href="https://app.hackthebox.com/profile/2070931" target="_blank">
+    <img src="https://static-00.iconduck.com/assets.00/hack-the-box-icon-2048x2048-vce7bnzq.png" alt="HackTheBox Logo" width="50" height="50">
   </a>
 </div>
