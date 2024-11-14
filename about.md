@@ -38,5 +38,5 @@ The content on this blog will include :
 </a>
 
 <a href="https://www.linkedin.com/in/snowyhiker/" target="_blank">
-  <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="Linkedin Logo" width="50" height="55">
+  <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="Linkedin Logo" width="50" height="50">
 </a>
