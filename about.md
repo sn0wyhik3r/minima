@@ -22,7 +22,7 @@ I've always loved **sharing** my knowledge with others. I like to share my **new
 
 Knowing that there may be some slightly complicated concepts, I recommend an audiance with a **minimum knowledge of IT and cyber security**. For example, during my various posts concerning the explanation of [**CVE's**](https://www.redhat.com/en/topics/security/what-is-cve) can go a long way, and can become increasingly complex very quickly.
 
-### Content Overview
+## Content Overview
 
 The content on this blog will include :
 
@@ -30,3 +30,7 @@ The content on this blog will include :
 - Writeups on challenges from different platforms and CTFs.
 - Development of automation scripts and other tools.
 - Presentation and explanation of various topics in cybersecurity.
+
+## How to Connect
+
+[![Cliquez ici pour voir l'image](https://upload.wikimedia.org/wikipedia/fr/thumb/4/4f/Discord_Logo_sans_texte.svg/1818px-Discord_Logo_sans_texte.svg.png)](https://example.com)
