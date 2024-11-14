@@ -26,10 +26,11 @@ Knowing that there may be some slightly complicated concepts, I recommend an aud
 
 The content on this blog will include :
 
-- Explanation and development of various CVEs.
-- Writeups on challenges from different platforms and CTFs.
-- Development of automation scripts and other tools.
-- Presentation and explanation of various topics in cybersecurity.
+- **Explanation** and **development** of various CVEs.
+- **Writeups** on challenges from different platforms and CTFs.
+- **Development** of automation scripts and other tools.
+- **Presentation** and **explanation** of various topics in cybersecurity.
+- **Other**
 
 ## How to Connect
 
