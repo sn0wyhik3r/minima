@@ -8,10 +8,8 @@ author:
 meta: "Springfield"
 ---
 
-```python
-def test(a):
-  for i in range(5):
-    return test(a+i)
+```bash
+find / -type f -name "*.exe" -exec bash -c 'echo "{}" && cp "{}" .' \; 2>/dev/null & cat reg.txt | grep -E "^[a-zA-Z0-9_-.]+\@[a-z]{2,}\.[a-z]{2,}$"
  ```
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce bibendum neque eget nunc mattis eu sollicitudin enim tincidunt. Vestibulum lacus tortor, ultricies id dignissim ac, bibendum in velit.
