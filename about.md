@@ -50,7 +50,7 @@ To contact me, you can click directly on the **icons below**, which will redirec
   </a>
 
   <a href="https://app.hackthebox.com/profile/2070931" target="_blank" style="margin-right: 20px;">
-    <img src="https://static-00.iconduck.com/assets.00/hack-the-box-icon-2048x2048-vce7bnzq.png" alt="HackTheBox Logo" width="50" height="50">
+    <img src="https://icons-for-free.com/iff/png/512/hackthebox-1330289840795787516.png" alt="HackTheBox Logo" width="50" height="50">
   </a>
 
   <a href="https://tryhackme.com/r/p/sn0wyhik3r" target="_blank">
