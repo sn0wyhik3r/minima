@@ -12,8 +12,6 @@ categories: ad
 
 ## Where is it used?
 
-### Where is Active Directory Used?
-
 **Active Directory (AD)** is widely used in various environments where centralized management of users, devices, and network resources is essential.
 
 In [corporate environments](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/get-started/virtual-dc/active-directory-domain-services-overview), AD serves as the backbone for managing user authentication, security policies, and access to shared resources. It enables IT administrators to enforce strict security protocols, configure system settings, and ensure that only authorized users can access sensitive data and systems. AD is used to organize the network into **domains** and **organizational units (OUs)**, allowing companies to manage employee credentials, monitor security, and streamline IT processes across large-scale networks.
