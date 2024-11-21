@@ -6,13 +6,9 @@ categories: ad
 
 # Introduction
 
----
-
 ## What is Active Directory?
 
 **Active Directory (AD)** is a centralized management service developed by Microsoft for Windows domain networks. It organizes and manages resources like **users, computers, groups, and devices** within a hierarchical structure that includes **domains** (basic management units), **Organizational Units (OUs)** (for grouping objects), and **forests** (collections of domains with shared configurations). AD is essential for **authentication** (verifying user identities) and **authorization** (controlling access to resources) through secure protocols. Thanks to its **scalability** and integration capabilities, AD allows administrators to enforce security policies, manage permissions, and deploy settings across the network using **Group Policy**. It is widely used in businesses to streamline IT operations.
-
----
 
 ## Where is it used?
 
