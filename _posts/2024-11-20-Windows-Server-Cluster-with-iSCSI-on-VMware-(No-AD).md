@@ -1,12 +1,12 @@
 ---
 layout: post
-title: "Windows Server Core 2025 Cluster with iSCSI on VMware (No AD)"
+title: "Setting Up a Windows Server Core 2025 Cluster with iSCSI on VMware (Without Active Directory)"
 categories: windows
 ---
 
 ## Introduction
 
-In this article, we'll explain **how to set up** a [storage server](https://www.broadberry.fr/storage-servers) using [Windows Server Core 2025](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2025) with [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI), designed to be shared by two [nodes](https://docs.vmware.com/en/VMware-Tanzu-Service-Mesh/services/concepts-guide/GUID-6BA4B828-C778-47BD-8159-37847260148E.html) ([virtual machines](https://www.vmware.com/topics/virtual-machine) running [Windows Server Core 2025](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2025)) within a [cluster environment](https://www.techopedia.com/definition/31922/virtual-machine-cluster-vm-cluster#:~:text=Virtual%20machine%20clusters%20work%20by%20protecting%20the%20physical,virtual%20machine%20clustering%20provides%20a%20dynamic%20backup%20processes.).
+In this article, we'll explain **how to set up** a [storage server](https://www.broadberry.fr/storage-servers) using [Windows Server Core 2025](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2025) with [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI), configured to be shared by two [nodes](https://docs.vmware.com/en/VMware-Tanzu-Service-Mesh/services/concepts-guide/GUID-6BA4B828-C778-47BD-8159-37847260148E.html) ([virtual machines](https://www.vmware.com/topics/virtual-machine) running [Windows Server Core 2025](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2025)) within a [cluster environment](https://www.techopedia.com/definition/31922/virtual-machine-cluster-vm-cluster#:~:text=Virtual%20machine%20clusters%20work%20by%20protecting%20the%20physical,virtual%20machine%20clustering%20provides%20a%20dynamic%20backup%20processes.).
 
 ## Basic VM Hardware Prerequisites
 
@@ -17,10 +17,18 @@ In this article, we'll explain **how to set up** a [storage server](https://www.
 | **Storage**       | - 50 GB system disk per VM     |
 |                   | - Additional storage for iSCSI VM as needed |
 | **Network**       | - 1 network interface per VM   |
-|                   | - Optional : second interface for iSCSI traffic |
+|                   | - Optional : a second interface for iSCSI traffic |
 | **VM Count**      | 3 VMs :                         |
 |                   | - 2 for cluster nodes          |
 |                   | - 1 for iSCSI Target Server    |
+
+## Additional Network Considerations for iSCSI
+
+To optimize the iSCSI performance, consider the following configurations :
+
+- **MTU (Jumbo Frames) :** Set the MTU to 9000 on the network interfaces dedicated to iSCSI traffic.
+- **Dedicated Network :** Use a separate VLAN or subnet for iSCSI traffic to isolate it from general network traffic.
+- **QoS (Quality of Service) :** Configure QoS to prioritize iSCSI traffic for improved reliability.
 
 ## Configure VM3 (iSCSI Target Server)
 
@@ -53,7 +61,7 @@ The following syntax is a PowerShell command used to create a new iSCSI target. 
 
 ```powershell
 New-IscsiServerTarget -TargetName "<TargetName>" -InitiatorIds @("IPAddress:<IP-VM1>", "IPAddress:<IP-VM2>", "...")
-# For initiators, it is also possible to do the following to authorize all initiators : "IQN:*"
+# For initiators, it is also possible to do the following to authorize all initiators: "IQN:*"
 ```
 
 The following syntax is a PowerShell command used to associate a virtual disk with an existing iSCSI target. The **`Add-IscsiVirtualDiskTargetMapping`** cmdlet maps the specified [virtual disk](https://www.parallels.com/blogs/ras/virtual-storage/) file (`"C:\<FolderName>\<StorageDiskName>.vhdx"`) to the iSCSI target identified by `<TargetName>`. This allows the virtual disk to be accessed by initiators connected to the target, effectively exposing the storage for use over the network.
@@ -62,7 +70,19 @@ The following syntax is a PowerShell command used to associate a virtual disk wi
 Add-IscsiVirtualDiskTargetMapping -TargetName "<TargetName>" -Path "C:\<FolderName>\<StorageDiskName>.vhdx"
 ```
 
-After that, we enable the **Multipath I/O ([MPIO](https://www.dell.com/support/kbdoc/en-us/000131854/mpio-what-is-it-and-why-should-i-use-it?msockid=21582e1206786daa394a3b4307d66c24))** feature on a Windows system. The **`Enable-WindowsOptionalFeature`** cmdlet activates the optional `MultiPathIO` feature, which provides support for multiple physical paths between a server and a storage device. This feature is essential for improving storage availability, fault tolerance, and performance by allowing load balancing and failover between paths in environments using [SAN](https://www.ibm.com/topics/storage-area-network) or [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI)-based storage.
+### Securing iSCSI with CHAP Authentication
+
+To improve security, enable **CHAP (Challenge Handshake Authentication Protocol)** authentication for iSCSI targets. Configure the CHAP credentials using the following command :
+
+```powershell
+Set-IscsiServerTarget -TargetName "<TargetName>" -ChapUsername "<ChapUsername>" -ChapPassword "<ChapPassword>"
+```
+
+This ensures only authorized initiators can access the target.
+
+### Enable Multipath I/O (MPIO)
+
+Enable the **Multipath I/O ([MPIO](https://www.dell.com/support/kbdoc/en-us/000131854/mpio-what-is-it-and-why-should-i-use-it?msockid=21582e1206786daa394a3b4307d66c24))** feature on the system. The **`Enable-WindowsOptionalFeature`** cmdlet activates the optional `MultiPathIO` feature, improving storage availability, fault tolerance, and performance.
 
 ```powershell
 Enable-WindowsOptionalFeature -Online -FeatureName MultiPathIO
@@ -70,7 +90,7 @@ Enable-WindowsOptionalFeature -Online -FeatureName MultiPathIO
 
 ## Configure VM1 and VM2 (Cluster Nodes)
 
-Like **virtual machine 3**, we're going to configure a static IP address for both virtual machines (which don't have a *DHCP server*).
+Like **virtual machine 3**, configure a static IP address for both virtual machines :
 
 ```powershell
 New-NetIPAddress -InterfaceAlias "<InterfaceName>" -IPAddress "<IP-VM>" -PrefixLength 24 -DefaultGateway "<IP-Gateway>"
@@ -78,7 +98,9 @@ Set-DnsClientServerAddress -InterfaceAlias (Get-NetAdapter -Name "<InterfaceName
 # On both nodes
 ```
 
-Creating a *local administrator* account on each node is essential to ensure consistent administrative access. It allows for uniform and secure management of the nodes, simplifying tasks such as configuring [iSCSI shares](https://www.techtarget.com/searchstorage/definition/iSCSI) or cluster setups. A dedicated account enhances security by separating roles and avoiding reliance on the built-in Administrator account, while also ensuring streamlined permission management across the nodes.
+### Local Administrator Account Setup
+
+Create a *local administrator* account on each node :
 
 ```powershell
 net user "<AdminUser>" "<StrongPassword>" /add
@@ -86,28 +108,20 @@ net localgroup Administrators "<AdminUser>" /add
 # On both nodes
 ```
 
-This step, starts the Microsoft iSCSI Initiator Service ([MSiSCSI](https://techcommunity.microsoft.com/blog/filecab/iscsi-target-cmdlet-reference/424419)), which enables the server to connect to **iSCSI targets** and access shared storage over the network. It is a crucial step in configuring **iSCSI connectivity** on a Windows system.
+### Connect Nodes to the iSCSI Target
+
+Start the iSCSI Initiator Service and add a new iSCSI target portal :
 
 ```powershell
 Start-Service -Name MSiSCSI
-# On both nodes
-```
-
-This PowerShell command above, adds a new **iSCSI target portal** to the initiator configuration. The **`New-IscsiTargetPortal`** cmdlet specifies the IP address of the iSCSI target server (`"IP_du_serveur_iSCSI"`), allowing the client (initiator) to communicate with the server and discover available iSCSI targets for connection.
-
-```powershell
 New-IscsiTargetPortal -TargetPortalAddress "IP-VM3"
-# On both nodes
-```
-
-The, we can connect the initiator to a specified iSCSI target. The **`Connect-IscsiTarget`** cmdlet uses the `NodeAddress` (the target's IQN identifier, `"IQN-Target"`) to establish the connection and ensures that the connection persists across system reboots with the `-IsPersistent $true` parameter. This is essential for maintaining consistent access to shared storage.
-
-```powershell
 Connect-IscsiTarget -NodeAddress "IQN-Target" -IsPersistent $true
 # On both nodes
 ```
 
-These commands **initialize** a specified disk, create a partition that uses the maximum `available space`, assign it a drive letter, and format it with the *NTFS* file system while labeling it as "ClusterDisk," making the disk ready for use in a storage or **cluster** environment. This configuration ensures that the disk is usable for the cluster. Initialization is performed only once, to avoid conflicts.
+### Initialize and Format the Disk
+
+Run the following commands to initialize, partition, and format the shared disk :
 
 ```powershell
 Initialize-Disk -Number <DiskNumber>
@@ -116,26 +130,28 @@ Format-Volume -DriveLetter <DriveLetter> -FileSystem NTFS -NewFileSystemLabel "<
 # On only one
 ```
 
-Then, install the **Failover Clustering** feature on a Windows Server. The **`-IncludeManagementTools`** parameter ensures that the associated management tools, such as the Failover Cluster Manager GUI and PowerShell cmdlets for managing clusters, are also installed. This is essential for configuring and managing high-availability clusters.
+## Cluster Setup
+
+### Install Failover Clustering
+
+Install the **Failover Clustering** feature on both nodes :
 
 ```powershell
 Install-WindowsFeature -Name Failover-Clustering -IncludeManagementTools
-# On both nodes
 ```
 
-Run the following command on a **single VM**, for example `VM1`. The test automatically includes the two nodes specified in the parameters. This analyzes the compatibility of the **two nodes** for clustering and identifies any problems before creating the *cluster*.
+### Test and Create the Cluster
+
+Run the following commands to test and create the cluster :
 
 ```powershell
 Test-Cluster -Node "VM1", "VM2"
-```
-
-Run the following command on a **single VM** (*the same VM where you tested the configuration*). Once the cluster has been created, it will be active on **both nodes**. This command **initializes** the `cluster` with a name and a virtual IP. The two nodes specified in the parameters become cluster members.
-
-```powershell
 New-Cluster -Name "ClusterName" -Node "VM1", "VM2" -StaticAddress "IP-Cluster"
 ```
 
-And finally, run the following command on a **single VM**, *as for the previous commands*. Once added, the disk is available to `all nodes` in the cluster. It associates the [iSCSI](https://techcommunity.microsoft.com/blog/filecab/iscsi-target-cmdlet-reference/424419) shared disk with the cluster so that it serves as a quorum, ensuring consistent decisions across the cluster.
+### Add the Shared Disk to the Cluster
+
+Finally, add the shared disk to the cluster :
 
 ```powershell
 Get-ClusterAvailableDisk | Add-ClusterDisk
