@@ -31,5 +31,6 @@ Install-WindowsFeature -Name FS-iSCSITarget-Server
 Once we've done that, we'll create a [virtual storage](https://www.parallels.com/blogs/ras/virtual-storage/) disk for the [storage share](https://www.vmware.com/docs/introduction-to-storage-virtualization). To do this, we'll use a [cmdlet](https://learn.microsoft.com/en-us/powershell/scripting/developer/cmdlet/cmdlet-overview?view=powershell-7.4) provided by theallity function we added earlier.
 
 ```powershell
-New-IscsiVirtualDisk -Path "C:\<FolderName>\<StorageDiskName>.vhdx" -Size <Size> # (e.g, 100GB)
+New-IscsiVirtualDisk -Path "C:\<FolderName>\<StorageDiskName>.vhdx" -Size 100GB
+# 100GB is our example, but you can size it as you wish.
 ```
