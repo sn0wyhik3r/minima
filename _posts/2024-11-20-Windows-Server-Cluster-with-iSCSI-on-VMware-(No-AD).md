@@ -21,3 +21,9 @@ Well, to begin with, let's take a look at the various prerequisites :
 | **VM Count**      | 3 VMs :                         |
 |                   | - 2 for cluster nodes          |
 |                   | - 1 for iSCSI Target Server    |
+
+Once the [**3 virtual machines**](https://www.vmware.com/topics/virtual-machine) have been set up correctly, we can get started. We'll start by configuring the [storage server](https://www.broadberry.fr/storage-servers) (the [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI) Target Server). The following syntax is a PowerShell command used to install a specific feature. [FS-iSCSITarget-Server](https://techdirectarchive.com/2021/07/14/how-to-install-and-configure-iscsi-target-server-and-iscsi-initiator-on-a-windows-server/), is the name of the feature that installs the tools and services needed to configure an [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI) Target Server.
+
+```powershell
+Install-WindowsFeature -Name FS-iSCSITarget-Server
+```
