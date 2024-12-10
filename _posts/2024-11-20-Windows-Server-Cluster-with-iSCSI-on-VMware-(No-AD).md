@@ -38,7 +38,7 @@ New-IscsiVirtualDisk -Path "C:\<FolderName>\<StorageDiskName>.vhdx" -Size 100GB
 Now we're going to create a new "**iSCSI target**", which acts as an access point for iSCSI initiators (the systems that will consume the storage). The name is used to identify this target when it is connected by **initiators**.
 
 ```powershell
-New-IscsiServerTarget -TargetName "<TargetName>" -InitiatorIds @("IPAddress:<IP-VM1>", "IPAddress:<IP-VM2>", ...)
+New-IscsiServerTarget -TargetName "<TargetName>" -InitiatorIds @("IPAddress:<IP-VM1>", "IPAddress:<IP-VM2>", "...")
 ```
 
 We're also going to **associate** the [virtual disk](https://www.parallels.com/blogs/ras/virtual-storage/) we created earlier with the targets we've just configured.
