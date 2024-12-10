@@ -124,9 +124,9 @@ Connect-IscsiTarget -NodeAddress "IQN-Target" -IsPersistent $true
 Run the following commands to initialize, partition, and format the shared disk :
 
 ```powershell
-Initialize-Disk -Number <DiskNumber>
-New-Partition -DiskNumber <DiskNumber> -UseMaximumSize -AssignDriveLetter
-Format-Volume -DriveLetter <DriveLetter> -FileSystem NTFS -NewFileSystemLabel "<StorageDiskName>"
+Initialize-Disk -Number "<DiskNumber>"
+New-Partition -DiskNumber "<DiskNumber>" -UseMaximumSize -AssignDriveLetter
+Format-Volume -DriveLetter "<DriveLetter>" -FileSystem NTFS -NewFileSystemLabel "<StorageDiskName>"
 # On only one
 ```
 
