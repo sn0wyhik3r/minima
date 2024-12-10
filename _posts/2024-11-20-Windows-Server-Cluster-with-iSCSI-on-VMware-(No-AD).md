@@ -27,3 +27,9 @@ Once the [**3 virtual machines**](https://www.vmware.com/topics/virtual-machine)
 ```powershell
 Install-WindowsFeature -Name FS-iSCSITarget-Server
 ```
+
+Once we've done that, we'll create a [virtual storage](https://www.parallels.com/blogs/ras/virtual-storage/) disk for the [storage share](https://www.vmware.com/docs/introduction-to-storage-virtualization). To do this, we'll use a [cmdlet](https://learn.microsoft.com/en-us/powershell/scripting/developer/cmdlet/cmdlet-overview?view=powershell-7.4) provided by theallity function we added earlier.
+
+```powershell
+New-IscsiVirtualDisk -Path "C:\<FolderName>\<StorageDiskName>.vhdx" -Size <Size> # (e.g, 100GB)
+```
