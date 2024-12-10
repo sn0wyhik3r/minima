@@ -66,18 +66,10 @@ Enable-WindowsOptionalFeature -Online -FeatureName MultiPathIO
 
 Like **virtual machine 3**, we're going to configure a static IP address for both virtual machines (which don't have a *DHCP server*).
 
-### VM-1
-
 ```powershell
 New-NetIPAddress -InterfaceAlias "<InterfaceName>" -IPAddress "<IP-VM1>" -PrefixLength 24 -DefaultGateway "<IP-Gateway>"
 Set-DnsClientServerAddress -InterfaceAlias (Get-NetAdapter -Name "<InterfaceName>" | Select-Object -ExpandProperty Name) -ServerAddresses "<IP-Gateway>"
-```
-
-### VM-2
-
-```powershell
-New-NetIPAddress -InterfaceAlias "<InterfaceName>" -IPAddress "<IP-VM2>" -PrefixLength 24 -DefaultGateway "<IP-Gateway>"
-Set-DnsClientServerAddress -InterfaceAlias (Get-NetAdapter -Name "<InterfaceName>" | Select-Object -ExpandProperty Name) -ServerAddresses "<IP-Gateway>"
+# On both nodes
 ```
 
 In an environment **without Active Directory**, creating a *local administrator* account on each node is essential to ensure consistent administrative access. It allows for uniform and secure management of the nodes, simplifying tasks such as configuring [iSCSI shares](https://www.techtarget.com/searchstorage/definition/iSCSI) or cluster setups. A dedicated account enhances security by separating roles and avoiding reliance on the built-in Administrator account, while also ensuring streamlined permission management across the nodes.
@@ -85,5 +77,12 @@ In an environment **without Active Directory**, creating a *local administrator*
 ```powershell
 net user AdminCluster StrongPassword123! /add
 net localgroup Administrators AdminCluster /add
+# On both nodes
+```
+
+In the next step, we'll set up **[Failover Clustering](https://learn.microsoft.com/en-us/windows-server/failover-clustering/failover-clustering-overview)**. It allows servers to *work together* as a **cluster**, providing high availability for applications and services.
+
+```powershell
+Install-WindowsFeature -Name Failover-Clustering -IncludeManagementTools
 # On both nodes
 ```
