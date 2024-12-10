@@ -24,39 +24,45 @@ In this article, we'll explain **how to set up** a [storage server](https://www.
 
 ## Configure VM3 (iSCSI Target Server)
 
-Once the [**3 virtual machines**](https://www.vmware.com/topics/virtual-machine) have been set up correctly, we can get started. We'll start by configuring the [storage server](https://www.broadberry.fr/storage-servers) (the [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI) Target Server). First, knowing that there's no DHCP server configured, we'll assign an **IP address** to the machine statically with the following command.
+Once the [**3 virtual machines**](https://www.vmware.com/topics/virtual-machine) have been set up correctly, we can get started. We'll start by configuring the [storage server](https://www.broadberry.fr/storage-servers) (the [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI) Target Server). First, we assign a static `IP address`, `subnet mask`, and `default gateway` to a specific **network interface**, ensuring consistent network configuration for environments like servers or devices that require fixed IP addresses for reliable communication.
 
 ```powershell
 New-NetIPAddress -InterfaceAlias "<InterfaceName>" -IPAddress "<IP-VM3>" -PrefixLength 24 -DefaultGateway "<IP-Gateway>"
+```
+
+After, we set the `DNS server address` for the specified **network interface**, ensuring that the interface uses the provided `<IP-Gateway>` as its **DNS server** for name resolution. It is useful in environments where manual **DNS configuration** is required for consistent and reliable network operations.
+
+```powershell
 Set-DnsClientServerAddress -InterfaceAlias (Get-NetAdapter -Name "<InterfaceName>" | Select-Object -ExpandProperty Name) -ServerAddresses "<IP-Gateway>"
 ```
 
-The following syntax is a PowerShell command used to install a specific feature. [FS-iSCSITarget-Server](https://techdirectarchive.com/2021/07/14/how-to-install-and-configure-iscsi-target-server-and-iscsi-initiator-on-a-windows-server/), is the name of the feature that installs the tools and services needed to configure an [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI) Target Server.
+The following syntax is a PowerShell command used to install a specific feature. [FS-iSCSITarget-Server](https://learn.microsoft.com/en-us/windows-server/storage/iscsi/iscsi-target-server), is the name of the feature that installs the tools and services required to configure an [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI) Target Server, enabling the server to host storage that can be accessed over the network by iSCSI initiators.
 
 ```powershell
 Install-WindowsFeature -Name FS-iSCSITarget-Server
 ```
 
-Once we've done that, we'll create a [virtual storage](https://www.parallels.com/blogs/ras/virtual-storage/) disk for the [storage share](https://www.vmware.com/docs/introduction-to-storage-virtualization). To do this, we'll use a [cmdlet](https://learn.microsoft.com/en-us/powershell/scripting/developer/cmdlet/cmdlet-overview?view=powershell-7.4) provided by theallity function we added earlier.
+Once we've done that, we create a virtual disk for use with iSCSI. The **`New-IscsiVirtualDisk`** cmdlet creates a new virtual disk file at the specified path (`"C:\<FolderName>\<StorageDiskName>.vhdx"`) with a size of **100GB**. This virtual disk can later be mapped to an iSCSI target, allowing it to be shared and accessed by iSCSI initiators over the network.
 
 ```powershell
 New-IscsiVirtualDisk -Path "C:\<FolderName>\<StorageDiskName>.vhdx" -Size 100GB
 # 100GB is our example, but you can size it as you wish.
 ```
 
-Now we're going to create a new "**iSCSI target**", which acts as an access point for iSCSI initiators (the systems that will consume the storage). The name is used to identify this target when it is connected by **initiators**.
+The following syntax is a PowerShell command used to create a new iSCSI target. The **`New-IscsiServerTarget`** cmdlet creates an iSCSI target with the specified name (`<TargetName>`), and associates it with a list of allowed initiators identified by their IP addresses (`<IP-VM1>`, `<IP-VM2>`). This defines which clients **can connect** to the target, ensuring secure and controlled access to the shared storage.
 
 ```powershell
 New-IscsiServerTarget -TargetName "<TargetName>" -InitiatorIds @("IPAddress:<IP-VM1>", "IPAddress:<IP-VM2>", "...")
+# For initiators, it is also possible to do the following to authorize all initiators : "IQN:*"
 ```
 
-We're also going to **associate** the [virtual disk](https://www.parallels.com/blogs/ras/virtual-storage/) we created earlier with the targets we've just configured.
+The following syntax is a PowerShell command used to associate a virtual disk with an existing iSCSI target. The **`Add-IscsiVirtualDiskTargetMapping`** cmdlet maps the specified [virtual disk](https://www.parallels.com/blogs/ras/virtual-storage/) file (`"C:\<FolderName>\<StorageDiskName>.vhdx"`) to the iSCSI target identified by `<TargetName>`. This allows the virtual disk to be accessed by initiators connected to the target, effectively exposing the storage for use over the network.
 
 ```powershell
 Add-IscsiVirtualDiskTargetMapping -TargetName "<TargetName>" -Path "C:\<FolderName>\<StorageDiskName>.vhdx"
 ```
 
-Next, we'll activate the **Multipath I/O** ([MPIO](https://www.dell.com/support/kbdoc/en-us/000131854/mpio-what-is-it-and-why-should-i-use-it?msockid=21582e1206786daa394a3b4307d66c24)) feature in Windows Server or Windows 10/11, enabling multipath management for [SAN](https://www.ibm.com/topics/storage-area-network) (Storage Area Network) or [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI) storage. It offers **[fault tolerance](https://www.geeksforgeeks.org/fault-tolerance-in-distributed-system/)** by redirecting **I/O** operations through an alternative path if the main path fails, improves performance by load balencing between several available paths, and is commonly used with [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI) or Fibre Channel storage environments.
+After that, we enable the **Multipath I/O ([MPIO](https://www.dell.com/support/kbdoc/en-us/000131854/mpio-what-is-it-and-why-should-i-use-it?msockid=21582e1206786daa394a3b4307d66c24))** feature on a Windows system. The **`Enable-WindowsOptionalFeature`** cmdlet activates the optional `MultiPathIO` feature, which provides support for multiple physical paths between a server and a storage device. This feature is essential for improving storage availability, fault tolerance, and performance by allowing load balancing and failover between paths in environments using [SAN](https://www.ibm.com/topics/storage-area-network) or [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI)-based storage.
 
 ```powershell
 Enable-WindowsOptionalFeature -Online -FeatureName MultiPathIO
@@ -67,22 +73,33 @@ Enable-WindowsOptionalFeature -Online -FeatureName MultiPathIO
 Like **virtual machine 3**, we're going to configure a static IP address for both virtual machines (which don't have a *DHCP server*).
 
 ```powershell
-New-NetIPAddress -InterfaceAlias "<InterfaceName>" -IPAddress "<IP-VM1>" -PrefixLength 24 -DefaultGateway "<IP-Gateway>"
+New-NetIPAddress -InterfaceAlias "<InterfaceName>" -IPAddress "<IP-VM>" -PrefixLength 24 -DefaultGateway "<IP-Gateway>"
 Set-DnsClientServerAddress -InterfaceAlias (Get-NetAdapter -Name "<InterfaceName>" | Select-Object -ExpandProperty Name) -ServerAddresses "<IP-Gateway>"
 # On both nodes
 ```
 
-In an environment **without Active Directory**, creating a *local administrator* account on each node is essential to ensure consistent administrative access. It allows for uniform and secure management of the nodes, simplifying tasks such as configuring [iSCSI shares](https://www.techtarget.com/searchstorage/definition/iSCSI) or cluster setups. A dedicated account enhances security by separating roles and avoiding reliance on the built-in Administrator account, while also ensuring streamlined permission management across the nodes.
+Creating a *local administrator* account on each node is essential to ensure consistent administrative access. It allows for uniform and secure management of the nodes, simplifying tasks such as configuring [iSCSI shares](https://www.techtarget.com/searchstorage/definition/iSCSI) or cluster setups. A dedicated account enhances security by separating roles and avoiding reliance on the built-in Administrator account, while also ensuring streamlined permission management across the nodes.
 
 ```powershell
-net user AdminCluster StrongPassword123! /add
-net localgroup Administrators AdminCluster /add
+net user "<AdminUser>" "<StrongPassword>" /add
+net localgroup Administrators "<AdminUser>" /add
 # On both nodes
 ```
 
-In the next step, we'll set up **[Failover Clustering](https://learn.microsoft.com/en-us/windows-server/failover-clustering/failover-clustering-overview)**. It allows servers to *work together* as a **cluster**, providing high availability for applications and services.
+This step, starts the Microsoft iSCSI Initiator Service ([MSiSCSI](https://techcommunity.microsoft.com/blog/filecab/iscsi-target-cmdlet-reference/424419)), which enables the server to connect to **iSCSI targets** and access shared storage over the network. It is a crucial step in configuring **iSCSI connectivity** on a Windows system.
 
 ```powershell
-Install-WindowsFeature -Name Failover-Clustering -IncludeManagementTools
-# On both nodes
+Start-Service -Name MSiSCSI
+```
+
+This PowerShell command above, adds a new **iSCSI target portal** to the initiator configuration. The **`New-IscsiTargetPortal`** cmdlet specifies the IP address of the iSCSI target server (`"IP_du_serveur_iSCSI"`), allowing the client (initiator) to communicate with the server and discover available iSCSI targets for connection.
+
+```powershell
+New-IscsiTargetPortal -TargetPortalAddress "IP-VM3"
+```
+
+The, we can connect the initiator to a specified iSCSI target. The **`Connect-IscsiTarget`** cmdlet uses the `NodeAddress` (the target's IQN identifier, `"IQN-Target"`) to establish the connection and ensures that the connection persists across system reboots with the `-IsPersistent $true` parameter. This is essential for maintaining consistent access to shared storage.
+
+```powershell
+Connect-IscsiTarget -NodeAddress "IQN_du_Target" -IsPersistent $true
 ```
