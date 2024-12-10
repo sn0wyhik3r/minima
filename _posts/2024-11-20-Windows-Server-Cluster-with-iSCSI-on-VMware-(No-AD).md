@@ -90,16 +90,53 @@ This step, starts the Microsoft iSCSI Initiator Service ([MSiSCSI](https://techc
 
 ```powershell
 Start-Service -Name MSiSCSI
+# On both nodes
 ```
 
 This PowerShell command above, adds a new **iSCSI target portal** to the initiator configuration. The **`New-IscsiTargetPortal`** cmdlet specifies the IP address of the iSCSI target server (`"IP_du_serveur_iSCSI"`), allowing the client (initiator) to communicate with the server and discover available iSCSI targets for connection.
 
 ```powershell
 New-IscsiTargetPortal -TargetPortalAddress "IP-VM3"
+# On both nodes
 ```
 
 The, we can connect the initiator to a specified iSCSI target. The **`Connect-IscsiTarget`** cmdlet uses the `NodeAddress` (the target's IQN identifier, `"IQN-Target"`) to establish the connection and ensures that the connection persists across system reboots with the `-IsPersistent $true` parameter. This is essential for maintaining consistent access to shared storage.
 
 ```powershell
-Connect-IscsiTarget -NodeAddress "IQN_du_Target" -IsPersistent $true
+Connect-IscsiTarget -NodeAddress "IQN-Target" -IsPersistent $true
+# On both nodes
+```
+
+These commands **initialize** a specified disk, create a partition that uses the maximum `available space`, assign it a drive letter, and format it with the *NTFS* file system while labeling it as "ClusterDisk," making the disk ready for use in a storage or **cluster** environment. This configuration ensures that the disk is usable for the cluster. Initialization is performed only once, to avoid conflicts.
+
+```powershell
+Initialize-Disk -Number <DiskNumber>
+New-Partition -DiskNumber <DiskNumber> -UseMaximumSize -AssignDriveLetter
+Format-Volume -DriveLetter <DriveLetter> -FileSystem NTFS -NewFileSystemLabel "<StorageDiskName>"
+# On only one
+```
+
+Then, install the **Failover Clustering** feature on a Windows Server. The **`-IncludeManagementTools`** parameter ensures that the associated management tools, such as the Failover Cluster Manager GUI and PowerShell cmdlets for managing clusters, are also installed. This is essential for configuring and managing high-availability clusters.
+
+```powershell
+Install-WindowsFeature -Name Failover-Clustering -IncludeManagementTools
+# On both nodes
+```
+
+Run the following command on a **single VM**, for example `VM1`. The test automatically includes the two nodes specified in the parameters. This analyzes the compatibility of the **two nodes** for clustering and identifies any problems before creating the *cluster*.
+
+```powershell
+Test-Cluster -Node "VM1", "VM2"
+```
+
+Run the following command on a **single VM** (*the same VM where you tested the configuration*). Once the cluster has been created, it will be active on **both nodes**. This command **initializes** the `cluster` with a name and a virtual IP. The two nodes specified in the parameters become cluster members.
+
+```powershell
+New-Cluster -Name "ClusterName" -Node "VM1", "VM2" -StaticAddress "IP-Cluster"
+```
+
+And finally, run the following command on a **single VM**, *as for the previous commands*. Once added, the disk is available to `all nodes` in the cluster. It associates the [iSCSI](https://techcommunity.microsoft.com/blog/filecab/iscsi-target-cmdlet-reference/424419) shared disk with the cluster so that it serves as a quorum, ensuring consistent decisions across the cluster.
+
+```powershell
+Get-ClusterAvailableDisk | Add-ClusterDisk
 ```
