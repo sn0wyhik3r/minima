@@ -4,9 +4,9 @@ title: "Windows Server Core 2025 Cluster with iSCSI on VMware (No AD)"
 categories: windows
 ---
 
-In this article, we'll explain **how to set up** a [storage server](https://www.broadberry.fr/storage-servers) using [Windows Server Core 2025](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2025) with [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI), designed to be shared by two [nodes](https://docs.vmware.com/en/VMware-Tanzu-Service-Mesh/services/concepts-guide/GUID-6BA4B828-C778-47BD-8159-37847260148E.html) ([virtual machines](https://www.vmware.com/topics/virtual-machine) running [Windows Server Core 2025](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2025)) within a [cluster environment](https://www.techopedia.com/definition/31922/virtual-machine-cluster-vm-cluster#:~:text=Virtual%20machine%20clusters%20work%20by%20protecting%20the%20physical,virtual%20machine%20clustering%20provides%20a%20dynamic%20backup%20processes.).
+## Introduction
 
-Well, to begin with, let's take a look at the various prerequisites :
+In this article, we'll explain **how to set up** a [storage server](https://www.broadberry.fr/storage-servers) using [Windows Server Core 2025](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2025) with [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI), designed to be shared by two [nodes](https://docs.vmware.com/en/VMware-Tanzu-Service-Mesh/services/concepts-guide/GUID-6BA4B828-C778-47BD-8159-37847260148E.html) ([virtual machines](https://www.vmware.com/topics/virtual-machine) running [Windows Server Core 2025](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2025)) within a [cluster environment](https://www.techopedia.com/definition/31922/virtual-machine-cluster-vm-cluster#:~:text=Virtual%20machine%20clusters%20work%20by%20protecting%20the%20physical,virtual%20machine%20clustering%20provides%20a%20dynamic%20backup%20processes.).
 
 ## Basic VM Hardware Prerequisites
 
@@ -22,7 +22,16 @@ Well, to begin with, let's take a look at the various prerequisites :
 |                   | - 2 for cluster nodes          |
 |                   | - 1 for iSCSI Target Server    |
 
-Once the [**3 virtual machines**](https://www.vmware.com/topics/virtual-machine) have been set up correctly, we can get started. We'll start by configuring the [storage server](https://www.broadberry.fr/storage-servers) (the [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI) Target Server). The following syntax is a PowerShell command used to install a specific feature. [FS-iSCSITarget-Server](https://techdirectarchive.com/2021/07/14/how-to-install-and-configure-iscsi-target-server-and-iscsi-initiator-on-a-windows-server/), is the name of the feature that installs the tools and services needed to configure an [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI) Target Server.
+## Configure VM3 (iSCSI Target Server)
+
+Once the [**3 virtual machines**](https://www.vmware.com/topics/virtual-machine) have been set up correctly, we can get started. We'll start by configuring the [storage server](https://www.broadberry.fr/storage-servers) (the [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI) Target Server). First, knowing that there's no DHCP server configured, we'll assign an **IP address** to the machine statically with the following command.
+
+```powershell
+New-NetIPAddress -InterfaceAlias "<InterfaceName>" -IPAddress "<IP-VM3>" -PrefixLength 24 -DefaultGateway "<IP-Gateway>"
+Set-DnsClientServerAddress -InterfaceAlias (Get-NetAdapter -Name "<InterfaceName>" | Select-Object -ExpandProperty Name) -ServerAddresses "<IP-Gateway>"
+```
+
+The following syntax is a PowerShell command used to install a specific feature. [FS-iSCSITarget-Server](https://techdirectarchive.com/2021/07/14/how-to-install-and-configure-iscsi-target-server-and-iscsi-initiator-on-a-windows-server/), is the name of the feature that installs the tools and services needed to configure an [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI) Target Server.
 
 ```powershell
 Install-WindowsFeature -Name FS-iSCSITarget-Server
@@ -51,4 +60,30 @@ Next, we'll activate the **Multipath I/O** ([MPIO](https://www.dell.com/support/
 
 ```powershell
 Enable-WindowsOptionalFeature -Online -FeatureName MultiPathIO
+```
+
+## Configure VM1 and VM2 (Cluster Nodes)
+
+Like **virtual machine 3**, we're going to configure a static IP address for both virtual machines (which don't have a *DHCP server*).
+
+### VM-1
+
+```powershell
+New-NetIPAddress -InterfaceAlias "<InterfaceName>" -IPAddress "<IP-VM1>" -PrefixLength 24 -DefaultGateway "<IP-Gateway>"
+Set-DnsClientServerAddress -InterfaceAlias (Get-NetAdapter -Name "<InterfaceName>" | Select-Object -ExpandProperty Name) -ServerAddresses "<IP-Gateway>"
+```
+
+### VM-2
+
+```powershell
+New-NetIPAddress -InterfaceAlias "<InterfaceName>" -IPAddress "<IP-VM2>" -PrefixLength 24 -DefaultGateway "<IP-Gateway>"
+Set-DnsClientServerAddress -InterfaceAlias (Get-NetAdapter -Name "<InterfaceName>" | Select-Object -ExpandProperty Name) -ServerAddresses "<IP-Gateway>"
+```
+
+In an environment **without Active Directory**, creating a *local administrator* account on each node is essential to ensure consistent administrative access. It allows for uniform and secure management of the nodes, simplifying tasks such as configuring [iSCSI shares](https://www.techtarget.com/searchstorage/definition/iSCSI) or cluster setups. A dedicated account enhances security by separating roles and avoiding reliance on the built-in Administrator account, while also ensuring streamlined permission management across the nodes.
+
+```powershell
+net user AdminCluster StrongPassword123! /add
+net localgroup Administrators AdminCluster /add
+# On both nodes
 ```
