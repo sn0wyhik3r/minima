@@ -8,31 +8,16 @@ In this article, we'll explain **how to set up** a [storage server](https://www.
 
 Well, to begin with, let's take a look at the various prerequisites :
 
-| Component              | Minimum Requirement                                                                 |
-|------------------------|-------------------------------------------------------------------------------------|
-| **Hypervisor**         | VMware Workstation, ESXi, or any other compatible hypervisor                       |
-| **Virtual Machines**   | - 3 VMs total :                                                                      |
-|                        |   - 2 for the cluster nodes                                                        |
-|                        |   - 1 for the iSCSI Target Server                                                  |
-|                        | - Each VM requires :                                                                |
-|                        |   - 2 vCPU                                                                          |
-|                        |   - 4 GB RAM (8 GB recommended)                                                     |
-|                        |   - 50 GB system disk (plus additional storage for iSCSI VM)                       |
-| **Operating System**   | Windows Server 2025 Standard or Datacenter                                         |
-| **Networking**         | - Static IP addresses for all VMs                                                  |
-|                        | - Network connectivity between VMs on the same subnet or routed network            |
-|                        | - Optional : Dedicated interface for iSCSI traffic                                  |
-| **Roles and Features** | - Failover Clustering on VM1 and VM2                                               |
-|                        | - Multi-Path I/O (MPIO) on VM1, VM2, and VM3                                        |
-|                        | - iSCSI Target Server role on VM3                                                  |
-| **Shared Storage**     | - At least one shared iSCSI disk                                                   |
-|                        | - Formatted with NTFS                                                              |
-|                        | - Adequate size for applications (100 GB or more)                            |
-| **Accounts and Security** | - Identical local administrator accounts (same username and password) on VM1 and VM2 |
-|                        | - Firewall configuration to allow required ports :                                  |
-|                        |   - iSCSI : 3260                                                                    |
-|                        |   - Clustering : 3343, 135, 445, 137-139                                            |
-| **Management Tools**   | - PowerShell (v5.1 or later)                                                       |
-|                        | - Failover Clustering management tools (installed via `-IncludeManagementTools`)    |
-| **Knowledge**          | - Understanding of clustering, iSCSI, and PowerShell                               |
-|                        | - Basic networking and Windows Server management                                   |
+# Basic VM Hardware Prerequisites
+
+| Component         | Minimum Requirement             |
+|-------------------|----------------------------------|
+| **CPU**           | 2 vCPUs per VM                 |
+| **Memory (RAM)**  | 4 GB per VM (8 GB recommended)  |
+| **Storage**       | - 50 GB system disk per VM     |
+|                   | - Additional storage for iSCSI VM as needed |
+| **Network**       | - 1 network interface per VM   |
+|                   | - Optional : second interface for iSCSI traffic |
+| **VM Count**      | 3 VMs :                         |
+|                   | - 2 for cluster nodes          |
+|                   | - 1 for iSCSI Target Server    |
