@@ -46,3 +46,9 @@ We're also going to **associate** the [virtual disk](https://www.parallels.com/b
 ```powershell
 Add-IscsiVirtualDiskTargetMapping -TargetName "<TargetName>" -Path "C:\<FolderName>\<StorageDiskName>.vhdx"
 ```
+
+Next, we'll activate the **Multipath I/O** ([MPIO](https://www.dell.com/support/kbdoc/en-us/000131854/mpio-what-is-it-and-why-should-i-use-it?msockid=21582e1206786daa394a3b4307d66c24)) feature in Windows Server or Windows 10/11, enabling multipath management for [SAN](https://www.ibm.com/topics/storage-area-network) (Storage Area Network) or [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI) storage. It offers **[fault tolerance](https://www.geeksforgeeks.org/fault-tolerance-in-distributed-system/)** by redirecting **I/O** operations through an alternative path if the main path fails, improves performance by load balencing between several available paths, and is commonly used with [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI) or Fibre Channel storage environments.
+
+```powershell
+Enable-WindowsOptionalFeature -Online -FeatureName MultiPathIO
+```
