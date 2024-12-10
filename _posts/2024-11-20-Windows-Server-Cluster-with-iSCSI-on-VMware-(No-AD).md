@@ -1,26 +1,27 @@
 ---
+
 layout: post
 title: "Setting Up a Windows Server Core 2025 Cluster with iSCSI on VMware (Without Active Directory)"
 categories: windows
----
+-------------------
 
 ## Introduction
 
-In this article, we'll explain **how to set up** a [storage server](https://www.broadberry.fr/storage-servers) using [Windows Server Core 2025](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2025) with [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI), configured to be shared by two [nodes](https://docs.vmware.com/en/VMware-Tanzu-Service-Mesh/services/concepts-guide/GUID-6BA4B828-C778-47BD-8159-37847260148E.html) ([virtual machines](https://www.vmware.com/topics/virtual-machine) running [Windows Server Core 2025](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2025)) within a [cluster environment](https://www.techopedia.com/definition/31922/virtual-machine-cluster-vm-cluster#:~:text=Virtual%20machine%20clusters%20work%20by%20protecting%20the%20physical,virtual%20machine%20clustering%20provides%20a%20dynamic%20backup%20processes.).
+In this article, we'll explain **how to set up** a [storage server](https://www.broadberry.fr/storage-servers) using [Windows Server Core 2025](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2025) with [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI), configured to be shared by two [nodes](https://docs.vmware.com/en/VMware-Tanzu-Service-Mesh/services/concepts-guide/GUID-6BA4B828-C778-47BD-8159-37847260148E.html) ([virtual machines](https://www.vmware.com/topics/virtual-machine) running [Windows Server Core 2025](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2025)) within a [cluster environment](https://www.techopedia.com/definition/31922/virtual-machine-cluster-vm-cluster#:~\:text=Virtual%20machine%20clusters%20work%20by%20protecting%20the%20physical,virtual%20machine%20clustering%20provides%20a%20dynamic%20backup%20processes.).
 
 ## Basic VM Hardware Prerequisites
 
-| Component         | Minimum Requirement             |
-|-------------------|----------------------------------|
-| **CPU**           | 2 vCPUs per VM                 |
-| **Memory (RAM)**  | 4 GB per VM (8 GB recommended)  |
-| **Storage**       | - 50 GB system disk per VM     |
-|                   | - Additional storage for iSCSI VM as needed |
-| **Network**       | - 1 network interface per VM   |
-|                   | - Optional : a second interface for iSCSI traffic |
-| **VM Count**      | 3 VMs :                         |
-|                   | - 2 for cluster nodes          |
-|                   | - 1 for iSCSI Target Server    |
+| Component        | Minimum Requirement                              |
+| ---------------- | ------------------------------------------------ |
+| **CPU**          | 2 vCPUs per VM                                   |
+| **Memory (RAM)** | 4 GB per VM (8 GB recommended)                   |
+| **Storage**      | - 50 GB system disk per VM                       |
+|                  | - Additional storage for iSCSI VM as needed      |
+| **Network**      | - 1 network interface per VM                     |
+|                  | - Optional : a second interface for iSCSI traffic |
+| **VM Count**     | 3 VMs :                                           |
+|                  | - 2 for cluster nodes                            |
+|                  | - 1 for iSCSI Target Server                      |
 
 ## Additional Network Considerations for iSCSI
 
@@ -32,7 +33,7 @@ To optimize the iSCSI performance, consider the following configurations :
 
 ## Configure VM3 (iSCSI Target Server)
 
-Once the [**3 virtual machines**](https://www.vmware.com/topics/virtual-machine) have been set up correctly, we can get started. We'll start by configuring the [storage server](https://www.broadberry.fr/storage-servers) (the [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI) Target Server). First, we assign a static `IP address`, `subnet mask`, and `default gateway` to a specific **network interface**, ensuring consistent network configuration for environments like servers or devices that require fixed IP addresses for reliable communication.
+Once the **[3 virtual machines](https://www.vmware.com/topics/virtual-machine)** have been set up correctly, we can get started. We'll start by configuring the [storage server](https://www.broadberry.fr/storage-servers) (the [iSCSI](https://www.techtarget.com/searchstorage/definition/iSCSI) Target Server). First, we assign a static `IP address`, `subnet mask`, and `default gateway` to a specific **network interface**, ensuring consistent network configuration for environments like servers or devices that require fixed IP addresses for reliable communication.
 
 ```powershell
 New-NetIPAddress -InterfaceAlias "<InterfaceName>" -IPAddress "<IP-VM3>" -PrefixLength 24 -DefaultGateway "<IP-Gateway>"
@@ -82,7 +83,7 @@ This ensures only authorized initiators can access the target.
 
 ### Enable Multipath I/O (MPIO)
 
-Enable the **Multipath I/O ([MPIO](https://www.dell.com/support/kbdoc/en-us/000131854/mpio-what-is-it-and-why-should-i-use-it?msockid=21582e1206786daa394a3b4307d66c24))** feature on the system. The **`Enable-WindowsOptionalFeature`** cmdlet activates the optional `MultiPathIO` feature, improving storage availability, fault tolerance, and performance.
+Enable the **Multipath I/O (****[MPIO](https://www.dell.com/support/kbdoc/en-us/000131854/mpio-what-is-it-and-why-should-i-use-it?msockid=21582e1206786daa394a3b4307d66c24)****)** feature on the system. The **`Enable-WindowsOptionalFeature`** cmdlet activates the optional `MultiPathIO` feature, improving storage availability, fault tolerance, and performance.
 
 ```powershell
 Enable-WindowsOptionalFeature -Online -FeatureName MultiPathIO
@@ -124,11 +125,13 @@ Connect-IscsiTarget -NodeAddress "IQN-Target" -IsPersistent $true
 Run the following commands to initialize, partition, and format the shared disk :
 
 ```powershell
-Initialize-Disk -Number "<DiskNumber>"
-New-Partition -DiskNumber "<DiskNumber>" -UseMaximumSize -AssignDriveLetter
-Format-Volume -DriveLetter "<DriveLetter>" -FileSystem NTFS -NewFileSystemLabel "<StorageDiskName>"
+Initialize-Disk -Number <DiskNumber>
+New-Partition -DiskNumber <DiskNumber> -UseMaximumSize -AssignDriveLetter
+Format-Volume -DriveLetter <DriveLetter> -FileSystem NTFS -NewFileSystemLabel "<StorageDiskName>"
 # On only one
 ```
+
+## Cluster Setup
 
 ### Install Failover Clustering
 
@@ -154,3 +157,13 @@ Finally, add the shared disk to the cluster :
 ```powershell
 Get-ClusterAvailableDisk | Add-ClusterDisk
 ```
+
+## Conclusion
+
+Setting up a Windows Server Core 2025 cluster with iSCSI on VMware provides a robust solution for high availability and shared storage in virtualized environments. By following this guide, you have successfully :
+
+- Configured an iSCSI Target Server to host shared storage.
+- Connected cluster nodes to the shared storage using secure and optimized iSCSI connections.
+- Established a failover cluster with shared disk resources for redundancy.
+
+This setup ensures that your environment can handle critical workloads with improved resilience, fault tolerance, and scalability. If you encounter any issues or need to customize further, consult Microsoft's documentation or reach out to your IT team for advanced configurations.
