@@ -8,7 +8,7 @@ In this article, we'll explain **how to set up** a [storage server](https://www.
 
 Well, to begin with, let's take a look at the various prerequisites :
 
-# Basic VM Hardware Prerequisites
+## Basic VM Hardware Prerequisites
 
 | Component         | Minimum Requirement             |
 |-------------------|----------------------------------|
