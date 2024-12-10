@@ -130,8 +130,6 @@ Format-Volume -DriveLetter <DriveLetter> -FileSystem NTFS -NewFileSystemLabel "<
 # On only one
 ```
 
-## Cluster Setup
-
 ### Install Failover Clustering
 
 Install the **Failover Clustering** feature on both nodes :
