@@ -145,6 +145,7 @@ Run the following commands to test and create the cluster :
 ```powershell
 Test-Cluster -Node "VM1", "VM2"
 New-Cluster -Name "ClusterName" -Node "VM1", "VM2" -StaticAddress "IP-Cluster"
+# On only one
 ```
 
 ### Add the Shared Disk to the Cluster
