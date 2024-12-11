@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Setting Up a Windows Server Core 2025 Cluster with iSCSI on VMware (Without Active Directory)"
+title: "Setting Up a Windows Server Core 2025 Hyper-V Cluster with iSCSI Server on VMware Workstation (Without Active Directory)"
 categories: windows
 ---
 
