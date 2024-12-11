@@ -80,6 +80,12 @@ Set-IscsiServerTarget -TargetName "<TargetName>" -ChapUsername "<ChapUsername>" 
 
 This ensures only authorized initiators can access the target.
 
+Let's launch the targets.
+
+```powershell
+Start-IscsiTarget -TargetName "Target1"
+```
+
 ### Enable Multipath I/O (MPIO)
 
 Enable the **Multipath I/O (****[MPIO](https://www.dell.com/support/kbdoc/en-us/000131854/mpio-what-is-it-and-why-should-i-use-it?msockid=21582e1206786daa394a3b4307d66c24)****)** feature on the system. The **`Enable-WindowsOptionalFeature`** cmdlet activates the optional `MultiPathIO` feature, improving storage availability, fault tolerance, and performance.
