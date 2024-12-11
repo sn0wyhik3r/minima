@@ -83,7 +83,7 @@ This ensures only authorized initiators can access the target.
 Let's launch the targets.
 
 ```powershell
-Start-IscsiTarget -TargetName "Target1"
+Start-IscsiTarget -TargetName "<TargetName>"
 ```
 
 ### Enable Multipath I/O (MPIO)
