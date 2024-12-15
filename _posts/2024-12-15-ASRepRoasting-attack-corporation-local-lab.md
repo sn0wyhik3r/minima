@@ -1,5 +1,5 @@
 ---
 layout: post
-title: "ASRepRoasting demonstration - CORPORATION Local Lab"
+title: "AS-REP Roasting Attack Demonstration - CORPORATION Local Lab"
 categories: windows
 ---
