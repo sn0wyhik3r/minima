@@ -1,5 +1,5 @@
 ---
 layout: post
-title: "AS-REP Roasting Attack Demonstration - CORPORATION Local Lab"
+title: "AS-REP Roasting Attack - Windows Server 2025"
 categories: windows
 ---
