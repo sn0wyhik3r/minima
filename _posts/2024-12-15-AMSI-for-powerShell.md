@@ -1,5 +1,5 @@
 ---
 layout: post
-title: "Let's talk about AMSI"
+title: "AMSI for PowerShell"
 categories: windows
 ---
